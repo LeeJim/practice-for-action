@@ -17,15 +17,15 @@ jobs:
           body+="\n- 参与人数: 1"
           body+="\n- 验收标准: 实现期望改造效果，提 PR 并通过验收无误"
           body+="\n- 备注: 最终激励以实际提交 \`pull request\` 并合并为准"
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo "body=${body}" >> $GITHUB_OUTPUT
+          delimiter="$(openssl rand -hex 8)"
+          echo "template_body<<${delimiter}" >> $GITHUB_ENV
+          echo "${body}" >> $GITHUB_ENV
+          echo "${delimiter}" >> $GITHUB_ENV
       - name: Update issue
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'update-issue'
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.template.outputs.body }}
+          body: ${{ env.template_body }}
           update-mode: 'append'
